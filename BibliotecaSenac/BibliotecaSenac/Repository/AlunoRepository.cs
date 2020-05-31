@@ -5,17 +5,17 @@ namespace BibliotecaSenac.Repository
 {
     public class AlunoRepository : IAlunoRepository
     {
-        public bool InserirValidar(AlunoModel aluno)
+        public RetornoTratado<AlunoModel> InserirValidar(AlunoModel aluno)
         {
             throw new System.NotImplementedException();
         }
 
-        public bool AlterarValidar(AlunoModel aluno)
+        public RetornoTratado<AlunoModel> AlterarValidar(AlunoModel aluno)
         {
             throw new System.NotImplementedException();
         }
         
-        public bool DeletarValidar(AlunoModel aluno)
+        public RetornoTratado<AlunoModel> DeletarValidar(AlunoModel aluno)
         {
             throw new System.NotImplementedException();
         }

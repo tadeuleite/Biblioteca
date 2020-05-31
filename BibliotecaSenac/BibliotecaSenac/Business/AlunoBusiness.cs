@@ -22,9 +22,9 @@ namespace BibliotecaSenac.Business
             }
             else
             {
-                retorno.Erro = alunoRepository.InserirValidar(aluno);
+                retorno = alunoRepository.InserirValidar(aluno);
             }
-            retorno.Erro = true;
+            
             return retorno;
         }
         public RetornoTratado<AlunoModel> AlterarValidar(AlunoModel aluno, RetornoTratado<AlunoModel> retorno)

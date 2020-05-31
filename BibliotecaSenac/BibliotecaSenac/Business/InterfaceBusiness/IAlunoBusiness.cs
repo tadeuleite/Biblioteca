@@ -4,9 +4,9 @@ namespace BibliotecaSenac.Business.InterfaceBusiness
 {
     public interface IAlunoBusiness
     {
-        RetornoTratado<AlunoModel> InserirValidar(AlunoModel aluno, RetornoTratado<AlunoModel>);
-        RetornoTratado<AlunoModel> AlterarValidar(AlunoModel aluno, RetornoTratado<AlunoModel>);
-        RetornoTratado<AlunoModel> DeletarValidar(AlunoModel aluno, RetornoTratado<AlunoModel>);
+        RetornoTratado<AlunoModel> InserirValidar(AlunoModel aluno, RetornoTratado<AlunoModel> retorno);
+        RetornoTratado<AlunoModel> AlterarValidar(AlunoModel aluno, RetornoTratado<AlunoModel> retorno);
+        RetornoTratado<AlunoModel> DeletarValidar(AlunoModel aluno, RetornoTratado<AlunoModel> retorno);
         RetornoTratado<AlunoModel> ConsultarValidar(AlunoModel aluno);
     }
 }
