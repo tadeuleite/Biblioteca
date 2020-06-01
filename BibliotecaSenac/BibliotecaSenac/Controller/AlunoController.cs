@@ -10,8 +10,9 @@ namespace BibliotecaSenac.Controllers
     {
         private readonly IAlunoBusiness alunoBusiness;
 
-        public AlunoController()
+        public AlunoController(IAlunoBusiness _alunoBusiness)
         {
+            alunoBusiness = _alunoBusiness;
         }
 
         [HttpPost]
@@ -19,7 +20,7 @@ namespace BibliotecaSenac.Controllers
         {
             RetornoTratado<AlunoModel> retorno = new RetornoTratado<AlunoModel>();
 
-            retorno.Erro = alunoBusiness.InserirValidar(aluno, retorno);
+            retorno = alunoBusiness.InserirValidar(aluno, retorno);
             
             return Ok(retorno);
         }
@@ -29,7 +30,7 @@ namespace BibliotecaSenac.Controllers
         {
             RetornoTratado<AlunoModel> retorno = new RetornoTratado<AlunoModel>();
 
-            retorno.Erro = alunoBusiness.AlterarValidar(aluno, retorno);
+            retorno = alunoBusiness.AlterarValidar(aluno, retorno);
 
             return Ok(retorno);
         }
@@ -39,15 +40,17 @@ namespace BibliotecaSenac.Controllers
         {
             RetornoTratado<AlunoModel> retorno = new RetornoTratado<AlunoModel>();
 
-            retorno.Erro = alunoBusiness.DeletarValidar(aluno, retorno);
+            retorno = alunoBusiness.DeletarValidar(aluno, retorno);
 
             return Ok(retorno);
         }
 
-        [HttpGet]
-        public IActionResult Consultar(AlunoModel aluno)
+        [HttpPost]
+        public IActionResult Consultar([FromBody]AlunoModel aluno)
         {
-            RetornoTratado<AlunoModel> retorno = alunoBusiness.ConsultarValidar(aluno);
+            RetornoTratado<AlunoModel> retorno = new RetornoTratado<AlunoModel>();
+            retorno.Objeto = new AlunoModel();
+            retorno = alunoBusiness.ConsultarValidar(aluno, retorno);
 
             return Ok(retorno);
         }

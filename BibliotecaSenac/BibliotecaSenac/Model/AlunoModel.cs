@@ -2,6 +2,7 @@
 {
     public class AlunoModel
     {
+        public int IdAluno{ get; set; }
         public string Nome { get; set; }
         public string Matricula { get; set; }
         public string Email { get; set; }
@@ -11,6 +12,7 @@
 
         public AlunoModel()
         {
+            IdAluno = 0;
             Nome = string.Empty;
             Matricula = string.Empty;
             Email = string.Empty;
