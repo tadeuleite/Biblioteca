@@ -69,7 +69,7 @@ namespace BibliotecaSenac.Repository
                         }
                         conexao.Close();
                     }
-                    catch (Exception e)
+                    catch (Exception exception)
                     {
                         transaction.Rollback();
 
@@ -120,7 +120,9 @@ namespace BibliotecaSenac.Repository
                                 variaveisMudanca.Append(camposObjetoGenerico[i] + "=" + parametros[i]);
                             else
                                 variaveisMudanca.Append(camposObjetoGenerico[i] + "=" + parametros[i] + ", ");
-                            valorClausula = parametroAlterar.ToUpper() == camposObjetoGenerico[i].ToUpper() ? parametros[i] : "";
+
+                            if (valorClausula == string.Empty)
+                                valorClausula = parametroAlterar.ToUpper() == camposObjetoGenerico[i].ToUpper() ? parametros[i] : "";
                         }
 
                         comando.CommandText =
@@ -145,7 +147,7 @@ namespace BibliotecaSenac.Repository
                         }
                         conexao.Close();
                     }
-                    catch (Exception e)
+                    catch (Exception exception)
                     {
                         transaction.Rollback();
 
@@ -208,7 +210,7 @@ namespace BibliotecaSenac.Repository
                             transaction.Commit();
                         }
                     }
-                    catch (Exception e)
+                    catch (Exception exception)
                     {
                         transaction.Rollback();
                         conexao.Close();
@@ -268,7 +270,7 @@ namespace BibliotecaSenac.Repository
                     conexao.Close();
 
                 }
-                catch (Exception ex)
+                catch (Exception exceptionx)
                 {
                     conexao.Close();
 

@@ -1,6 +1,8 @@
-﻿namespace BibliotecaSenac.Business.InterfaceBusiness
+﻿using BibliotecaSenac.Model;
+
+namespace BibliotecaSenac.Business.InterfaceBusiness
 {
-    public interface ILivroBusiness
+    public interface ILivroBusiness : IGenericBusiness<LivroModel>
     {
     }
 }
