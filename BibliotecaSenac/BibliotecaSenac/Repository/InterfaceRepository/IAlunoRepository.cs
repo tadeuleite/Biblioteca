@@ -2,11 +2,8 @@
 
 namespace BibliotecaSenac.Repository.InterfaceRepository
 {
-    public interface IAlunoRepository
+    public interface IAlunoRepository : IGenericRepository<AlunoModel>
     {
-        RetornoTratado<AlunoModel> InserirValidar(AlunoModel aluno, RetornoTratado<AlunoModel> retorno);
-        RetornoTratado<AlunoModel> AlterarValidar(AlunoModel aluno, RetornoTratado<AlunoModel> retorno);
-        RetornoTratado<AlunoModel> DeletarValidar(AlunoModel aluno, RetornoTratado<AlunoModel> retorno);
-        RetornoTratado<AlunoModel> ConsultarValidar(AlunoModel aluno, RetornoTratado<AlunoModel> retorno);
+        
     }
 }

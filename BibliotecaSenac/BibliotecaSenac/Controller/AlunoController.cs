@@ -26,21 +26,21 @@ namespace BibliotecaSenac.Controllers
         }
 
         [HttpPut]
-        public IActionResult Alterar(AlunoModel aluno)
+        public IActionResult Alterar(AlunoModel aluno, string parametroAlterar)
         {
             RetornoTratado<AlunoModel> retorno = new RetornoTratado<AlunoModel>();
 
-            retorno = alunoBusiness.AlterarValidar(aluno, retorno);
+            retorno = alunoBusiness.AlterarValidar(aluno, retorno, parametroAlterar);
 
             return Ok(retorno);
         }
 
         [HttpDelete]
-        public IActionResult Deletar(AlunoModel aluno)
+        public IActionResult Deletar(AlunoModel aluno, string parametroDeletar)
         {
             RetornoTratado<AlunoModel> retorno = new RetornoTratado<AlunoModel>();
 
-            retorno = alunoBusiness.DeletarValidar(aluno, retorno);
+            retorno = alunoBusiness.DeletarValidar(aluno, retorno, parametroDeletar);
 
             return Ok(retorno);
         }
@@ -50,9 +50,19 @@ namespace BibliotecaSenac.Controllers
         {
             RetornoTratado<AlunoModel> retorno = new RetornoTratado<AlunoModel>();
             retorno.Objeto = new AlunoModel();
-            retorno = alunoBusiness.ConsultarValidar(aluno, retorno);
+            var retornos = alunoBusiness.ConsultarValidar(aluno, retorno);
 
-            return Ok(retorno);
+            return Ok(retornos);
+        }
+        
+        [HttpPost]
+        public IActionResult ConsultarPorParametro([FromBody]AlunoModel aluno, string parametroConsulta)
+        {
+            RetornoTratado<AlunoModel> retorno = new RetornoTratado<AlunoModel>();
+            retorno.Objeto = new AlunoModel();
+            var retornos = alunoBusiness.ConsultarValidar(aluno, retorno);
+
+            return Ok(retornos);
         }
     }
 }

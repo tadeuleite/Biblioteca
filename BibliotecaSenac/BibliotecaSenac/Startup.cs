@@ -1,5 +1,6 @@
 using BibliotecaSenac.Business;
 using BibliotecaSenac.Business.InterfaceBusiness;
+using BibliotecaSenac.Model;
 using BibliotecaSenac.Repository;
 using BibliotecaSenac.Repository.InterfaceRepository;
 using Microsoft.AspNetCore.Builder;
@@ -63,7 +64,6 @@ namespace BibliotecaSenac
             app.UseRouting();
 
             app.UseAuthorization();
-
 
             app.UseMvc();
         }

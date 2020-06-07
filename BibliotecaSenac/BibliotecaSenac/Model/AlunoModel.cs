@@ -1,8 +1,10 @@
-﻿namespace BibliotecaSenac.Model
+﻿using System.Collections.Generic;
+
+namespace BibliotecaSenac.Model
 {
     public class AlunoModel
     {
-        public int IdAluno{ get; set; }
+        public int IdAluno { get; set; }
         public string Nome { get; set; }
         public string Matricula { get; set; }
         public string Email { get; set; }
