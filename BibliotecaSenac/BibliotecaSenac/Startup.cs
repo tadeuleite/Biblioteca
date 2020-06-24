@@ -73,12 +73,14 @@ namespace BibliotecaSenac
             #region Business
             services.AddScoped<IAlunoBusiness, AlunoBusiness>();
             services.AddScoped<ILivroBusiness, LivroBusiness>();
+            services.AddScoped<IEmprestimoBusiness, EmprestimoBusiness>();
 
             #endregion
 
             #region Repository
             services.AddScoped<IAlunoRepository, AlunoRepository>();
             services.AddScoped<ILivroRepository, LivroRepository>();
+            services.AddScoped<IEmprestimoRepository, EmprestimoRepository>();
 
             #endregion
             return services;

@@ -9,7 +9,7 @@ namespace BibliotecaSenac.Controller
     public abstract class GenericController<T> : ControllerBase
     {
         private readonly IGenericBusiness<T> genericBusiness;
-        
+
         public GenericController()
         {
 
@@ -20,52 +20,89 @@ namespace BibliotecaSenac.Controller
             genericBusiness = _genericBusiness;
         }
 
+        /// <summary>
+        /// Método genérico para inserir um dado no banco
+        /// </summary>
+        /// <param name="objeto"></param>
+        /// <returns></returns>
         [HttpPost]
-        public IActionResult Inserir(T aluno)
+        public IActionResult Inserir([FromBody]T objeto)
         {
             RetornoTratado<T> retorno = new RetornoTratado<T>();
 
-            retorno = genericBusiness.InserirValidar(aluno, retorno);
+            retorno = genericBusiness.InserirValidar(objeto, retorno);
 
-            return Ok(retorno);
+            if (retorno.Erro == true)
+                return Unauthorized(retorno);
+            else
+                return Ok(retorno);
         }
 
+        /// <summary>
+        /// Método genérico para alterar um dado, quando alterar, enviar todos os dados, mesmo os não alterados
+        /// </summary>
+        /// <param name="objeto"></param>
+        /// <param name="parametroAlterar">Parâmetro identificador para alteração no banco</param>
+        /// <returns></returns>
         [HttpPut]
-        public IActionResult Alterar(T aluno, string parametroAlterar)
+        public IActionResult Alterar(T objeto, string parametroAlterar)
         {
             RetornoTratado<T> retorno = new RetornoTratado<T>();
 
-            retorno = genericBusiness.AlterarValidar(aluno, retorno, parametroAlterar);
+            retorno = genericBusiness.AlterarValidar(objeto, retorno, parametroAlterar);
 
-            return Ok(retorno);
+            if (retorno.Erro == true)
+                return Unauthorized(retorno);
+            else
+                return Ok(retorno);
         }
 
+        /// <summary>
+        /// Método genérico para Deletar
+        /// </summary>
+        /// <param name="objeto"></param>
+        /// <param name="parametroDeletar">Parâmetro identificador para alteração no banco</param>
+        /// <returns></returns>
         [HttpDelete]
-        public IActionResult Deletar(T aluno, string parametroDeletar)
+        public IActionResult Deletar(T objeto, string parametroDeletar)
         {
             RetornoTratado<T> retorno = new RetornoTratado<T>();
 
-            retorno = genericBusiness.DeletarValidar(aluno, retorno, parametroDeletar);
+            retorno = genericBusiness.DeletarValidar(objeto, retorno, parametroDeletar);
 
-            return Ok(retorno);
+            if (retorno.Erro == true)
+                return Unauthorized(retorno);
+            else
+                return Ok(retorno);
+        }
+
+        /// <summary>
+        /// Método genérico para consultar todos registros
+        /// </summary>
+        /// <param name="objeto">Não necessário</param>
+        /// <returns></returns>
+        [HttpPost]
+        public IActionResult Consultar(T objeto)
+        {
+            RetornoTratado<T> retorno = new RetornoTratado<T>();
+            retorno.Objeto = genericBusiness.ConsultarValidar(objeto, retorno);
+
+            if (retorno.Erro == true)
+                return Unauthorized(retorno);
+            else
+                return Ok(retorno);
         }
 
         [HttpPost]
-        public IActionResult Consultar([FromBody]T aluno)
+        public IActionResult ConsultarComParametro([FromBody]T objeto)
         {
             RetornoTratado<T> retorno = new RetornoTratado<T>();
-            var retornos = genericBusiness.ConsultarValidar(aluno, retorno);
+            retorno.Objeto = genericBusiness.ConsultarComParametro(objeto, retorno);
 
-            return Ok(retornos);
-        }
-
-        [HttpPost]
-        public IActionResult ConsultarPorParametro([FromBody]T aluno, string parametroConsulta)
-        {
-            RetornoTratado<T> retorno = new RetornoTratado<T>();
-            var retornos = genericBusiness.ConsultarValidar(aluno, retorno);
-
-            return Ok(retornos);
+            if (retorno.Erro == true)
+                return Unauthorized(retorno);
+            else
+                return Ok(retorno);
         }
     }
 }

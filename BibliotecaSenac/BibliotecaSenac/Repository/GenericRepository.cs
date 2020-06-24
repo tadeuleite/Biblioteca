@@ -13,7 +13,7 @@ namespace BibliotecaSenac.Repository
 {
     public abstract class GenericRepository<T> : IGenericRepository<T>
     {
-        private readonly IConfiguration configuration;
+        protected readonly IConfiguration configuration;
 
         public GenericRepository()
         {
@@ -24,12 +24,13 @@ namespace BibliotecaSenac.Repository
             configuration = _configuration;
         }
 
-        public virtual RetornoTratado<T> Inserir(T objeto, RetornoTratado<T> retorno)
+        public virtual RetornoTratado<T> Inserir(T objeto, RetornoTratado<T> retorno, bool commitTransaction = true, IDbConnection conexao = null, IDbTransaction transaction = null)
         {
-            using (IDbConnection conexao = new SqlConnection(configuration.GetValue<string>("SqlConnection")))
+            using (conexao = conexao == null ? new SqlConnection(configuration.GetValue<string>("SqlConnection")) : conexao)
             {
-                conexao.Open();
-                using (IDbTransaction transaction = conexao.BeginTransaction())
+                if (conexao.State == ConnectionState.Closed)
+                    conexao.Open();
+                using (transaction = transaction == null ? conexao.BeginTransaction() : transaction)
                 {
                     try
                     {
@@ -38,14 +39,20 @@ namespace BibliotecaSenac.Repository
 
                         var camposObjetoGenerico = ObterNomePropriedades(objeto);
                         var camposPesquisa = new StringBuilder();
+
+                        if (camposObjetoGenerico.Contains("NOMETABELA"))
+                            camposObjetoGenerico.Remove("NOMETABELA");
+
                         foreach (var item in camposObjetoGenerico)
-                            if (!(item.ToUpper().Equals("ID" + ObterNomeTabela(objeto).ToUpper())))
+                            if (!item.ToUpper().Equals("ID" + ObterNomeTabela(objeto).ToUpper()))
                                 camposPesquisa = item == camposObjetoGenerico.Last() ? camposPesquisa.Append(item) : camposPesquisa.Append(item + ", ");
 
                         var parametros = ObterValoresObjeto(objeto);
                         var parametrosPesquisa = new StringBuilder();
+
+                        parametros.Remove("'" + ObterNomeTabela(objeto) + "'");
                         foreach (var item in parametros)
-                            if (!(item.ToUpper().Equals(parametros.First().ToUpper())))
+                            if (!item.ToUpper().Equals(parametros.First().ToUpper()))
                                 parametrosPesquisa = item == parametros.Last() ? parametrosPesquisa.Append(item) : parametrosPesquisa.Append(item + ", ");
 
                         comando.CommandText =
@@ -53,9 +60,7 @@ namespace BibliotecaSenac.Repository
                                 {ObterNomeTabela(objeto)}  ({camposPesquisa})
                                 VALUES ({parametrosPesquisa})";
 
-
                         var linhasRetornadas = comando.ExecuteNonQuery();
-
 
                         if (linhasRetornadas < 0)
                         {
@@ -65,7 +70,8 @@ namespace BibliotecaSenac.Repository
                         }
                         else
                         {
-                            transaction.Commit();
+                            if (commitTransaction)
+                                transaction.Commit();
                         }
                         conexao.Close();
                     }
@@ -74,6 +80,7 @@ namespace BibliotecaSenac.Repository
                         transaction.Rollback();
 
                         retorno.Erro = true;
+                        retorno.ErroLocal = exception.StackTrace;
                         retorno.MensagemErro = "Erro ao inserir no banco";
                     }
                     finally
@@ -88,12 +95,13 @@ namespace BibliotecaSenac.Repository
             return retorno;
         }
 
-        public virtual RetornoTratado<T> Alterar(T objeto, RetornoTratado<T> retorno, string parametroAlterar)
+        public virtual RetornoTratado<T> Alterar(T objeto, RetornoTratado<T> retorno, string parametroAlterar, bool commitTransaction = true, IDbConnection conexao = null, IDbTransaction transaction = null)
         {
-            using (IDbConnection conexao = new SqlConnection(configuration.GetValue<string>("SqlConnection")))
+            using (conexao = conexao == null ? new SqlConnection(configuration.GetValue<string>("SqlConnection")) : conexao)
             {
-                conexao.Open();
-                using (IDbTransaction transaction = conexao.BeginTransaction())
+                if (conexao.State == ConnectionState.Closed)
+                    conexao.Open();
+                using (transaction = transaction == null ? conexao.BeginTransaction() : transaction)
                 {
                     try
                     {
@@ -102,14 +110,18 @@ namespace BibliotecaSenac.Repository
 
                         var camposObjetoGenerico = ObterNomePropriedades(objeto);
                         var camposPesquisa = new StringBuilder();
+
+                        if (camposObjetoGenerico.Contains("NOMETABELA"))
+                            camposObjetoGenerico.Remove("NOMETABELA");
+
                         foreach (var item in camposObjetoGenerico)
-                            if (!(item.ToUpper().Equals("ID" + ObterNomeTabela(objeto).ToUpper())))
+                            if (!item.ToUpper().Equals("ID" + ObterNomeTabela(objeto).ToUpper()))
                                 camposPesquisa = item == camposObjetoGenerico.Last() ? camposPesquisa.Append(item) : camposPesquisa.Append(item + ", ");
 
                         var parametros = ObterValoresObjeto(objeto);
                         var parametrosPesquisa = new StringBuilder();
                         foreach (var item in parametros)
-                            if (!(item.ToUpper().Equals(parametros.First().ToUpper())))
+                            if (!item.ToUpper().Equals(parametros.First().ToUpper()))
                                 parametrosPesquisa = item == parametros.Last() ? parametrosPesquisa.Append(item) : parametrosPesquisa.Append(item + ", ");
 
                         var variaveisMudanca = new StringBuilder();
@@ -143,7 +155,8 @@ namespace BibliotecaSenac.Repository
                         }
                         else
                         {
-                            transaction.Commit();
+                            if (commitTransaction)
+                                transaction.Commit();
                         }
                         conexao.Close();
                     }
@@ -152,6 +165,7 @@ namespace BibliotecaSenac.Repository
                         transaction.Rollback();
 
                         retorno.Erro = true;
+                        retorno.ErroLocal = exception.StackTrace;
                         retorno.MensagemErro = "Erro ao alterar no banco";
                     }
                     finally
@@ -166,30 +180,36 @@ namespace BibliotecaSenac.Repository
             return retorno;
         }
 
-        public virtual RetornoTratado<T> Deletar(T objeto, RetornoTratado<T> retorno, string parametroDeletar)
+        public virtual RetornoTratado<T> Deletar(T objeto, RetornoTratado<T> retorno, string parametroDeletar, bool commitTransaction = true, IDbConnection conexao = null, IDbTransaction transaction = null)
         {
-            using (IDbConnection conexao = new SqlConnection(configuration.GetValue<string>("SqlConnection")))
+            using (conexao = conexao == null ? new SqlConnection(configuration.GetValue<string>("SqlConnection")) : conexao)
             {
-                conexao.Open();
-                using (IDbTransaction transaction = conexao.BeginTransaction())
+                if (conexao.State == ConnectionState.Closed)
+                    conexao.Open();
+                using (transaction = transaction == null ? conexao.BeginTransaction() : transaction)
                 {
                     try
                     {
                         IDbCommand comando = conexao.CreateCommand();
                         comando.Transaction = transaction;
 
-                        var camposObjetoGenerico = ObterNomePropriedades(objeto);
-                        var parametros = ObterValoresObjeto(objeto);
-                        var variaveisMudanca = new StringBuilder();
                         var valorClausula = string.Empty;
+                        var camposeValores = ObterCampoValoresObjeto(objeto);
 
-                        for (int i = 1; i < camposObjetoGenerico.Count(); i++)
+                        foreach (var item in camposeValores)
                         {
-                            if (i == camposObjetoGenerico.Count() - 1)
-                                variaveisMudanca.Append(camposObjetoGenerico[i] + "=" + parametros[i]);
-                            else
-                                variaveisMudanca.Append(camposObjetoGenerico[i] + "=" + parametros[i] + ", ");
-                            valorClausula = parametroDeletar.ToUpper() == camposObjetoGenerico[i].ToUpper() ? parametros[i] : "";
+                            if (parametroDeletar.ToUpper().Equals(item.Key.ToUpper()))
+                            {
+                                if (item.Value is int)
+                                {
+                                    valorClausula = item.Value.ToString();
+                                }
+                                else if (item.Value is string)
+                                {
+
+                                    valorClausula = "'" + item.Value.ToString() + "'";
+                                }
+                            }
                         }
 
                         comando.CommandText =
@@ -207,7 +227,8 @@ namespace BibliotecaSenac.Repository
                         }
                         else
                         {
-                            transaction.Commit();
+                            if (commitTransaction)
+                                transaction.Commit();
                         }
                     }
                     catch (Exception exception)
@@ -216,22 +237,24 @@ namespace BibliotecaSenac.Repository
                         conexao.Close();
 
                         retorno.Erro = true;
+                        retorno.ErroLocal = exception.StackTrace;
                         retorno.MensagemErro = "Erro ao deletar Aluno no banco";
                     }
                     finally
                     {
-                        conexao.Close();
+                        if (conexao.State == ConnectionState.Open)
+                            conexao.Close();
                     }
                 }
             }
             return retorno;
         }
 
-        public virtual List<T> Consultar(T objetoGenerico, RetornoTratado<T> retorno)
+        public virtual List<T> Consultar(T objetoGenerico, RetornoTratado<T> retorno, IDbConnection conexao = null, IDbTransaction transaction = null)
         {
             var resultSelect = new Dictionary<string, object>();
 
-            using (IDbConnection conexao = new SqlConnection(configuration.GetValue<string>("SqlConnection")))
+            using (conexao = conexao == null ? new SqlConnection(configuration.GetValue<string>("SqlConnection")) : conexao)
             {
                 var objetoPreenchido = new List<T>();
 
@@ -242,8 +265,13 @@ namespace BibliotecaSenac.Repository
                     var camposObjetoGenerico = ObterNomePropriedades(objetoGenerico);
 
                     StringBuilder camposPesquisa = new StringBuilder();
+                    if (camposObjetoGenerico.Contains("NOMETABELA"))
+                        camposObjetoGenerico.Remove("NOMETABELA");
+
                     foreach (var item in camposObjetoGenerico)
+                    {
                         camposPesquisa = item == camposObjetoGenerico.Last() ? camposPesquisa.Append(item) : camposPesquisa.Append(item + ", ");
+                    }
 
                     comando.CommandText =
                         $@" SELECT 
@@ -251,7 +279,8 @@ namespace BibliotecaSenac.Repository
                             FROM {ObterNomeTabela(objetoGenerico)}
                             ";
 
-                    conexao.Open();
+                    if (conexao.State == ConnectionState.Closed)
+                        conexao.Open();
                     var linhasRetornadas = comando.ExecuteReader();
 
                     while (linhasRetornadas.Read())
@@ -267,14 +296,17 @@ namespace BibliotecaSenac.Repository
 
                         resultSelect.Clear();
                     }
+                    linhasRetornadas.Close();
+
                     conexao.Close();
 
                 }
-                catch (Exception exceptionx)
+                catch (Exception exception)
                 {
                     conexao.Close();
 
                     retorno.Erro = true;
+                    retorno.ErroLocal = exception.StackTrace;
                     retorno.MensagemErro = "Erro ao consultar no banco";
                 }
                 finally
@@ -288,17 +320,216 @@ namespace BibliotecaSenac.Repository
             }
         }
 
-        public virtual List<T> ConsultarPorParametro(T aluno, RetornoTratado<T> retorno, string parametroConsultar)
+        public virtual List<T> ConsultarComParametro(T objeto, RetornoTratado<T> retorno, IDbConnection conexao = null, IDbTransaction transaction = null)
         {
-            return null;
+            var resultSelect = new Dictionary<string, object>();
+
+            using (conexao = conexao == null ? new SqlConnection(configuration.GetValue<string>("SqlConnection")) : conexao)
+            {
+                var objetoPreenchido = new List<T>();
+
+                try
+                {
+                    IDbCommand comando = conexao.CreateCommand();
+                    if (transaction != null)
+                        comando.Transaction = transaction;
+
+                    var propriedades = ObterNomePropriedades(objeto);
+
+                    StringBuilder camposPesquisa = new StringBuilder();
+                    if (propriedades.Contains("NOMETABELA"))
+                        propriedades.Remove("NOMETABELA");
+
+                    foreach (var item in propriedades)
+                    {
+                        camposPesquisa = item == propriedades.Last() ? camposPesquisa.Append(item) : camposPesquisa.Append(item + ", ");
+                    }
+
+                    comando.CommandText =
+                        $@" SELECT 
+                                {camposPesquisa}
+                            FROM {ObterNomeTabela(objeto)}
+                            {ObterWhere(objeto)}
+                            ";
+
+                    if (conexao.State == ConnectionState.Closed)
+                        conexao.Open();
+                    var linhasRetornadas = comando.ExecuteReader();
+
+                    while (linhasRetornadas.Read())
+                    {
+                        var stringJson = string.Empty;
+
+                        foreach (var propriedade in propriedades)
+                        {
+                            if (!propriedade.Equals("NOMETABELA"))
+                                resultSelect.Add(propriedade, linhasRetornadas[propriedade.ToUpper().ToString()]);
+                        }
+
+                        stringJson = JsonConvert.SerializeObject(resultSelect);
+
+                        objetoPreenchido.Add(JsonConvert.DeserializeObject<T>(stringJson));
+
+                        resultSelect.Clear();
+                    }
+                    linhasRetornadas.Close();
+
+                    conexao.Close();
+
+                }
+                catch (Exception exception)
+                {
+                    conexao.Close();
+
+                    retorno.Erro = true;
+                    retorno.ErroLocal = exception.StackTrace;
+                    retorno.MensagemErro = "Erro ao consultar no banco";
+                }
+                finally
+                {
+                    if (conexao.State == ConnectionState.Open)
+                    {
+                        conexao.Close();
+                    }
+                }
+                return objetoPreenchido;
+            }
+        }
+        public virtual RetornoTratado<T> AlterarSemPerderConexao(T objeto, RetornoTratado<T> retorno, string parametroAlterar, bool commitTransaction = true, IDbConnection conexao = null, IDbTransaction transaction = null)
+        {
+            try
+            {
+                IDbCommand comando = conexao.CreateCommand();
+                comando.Transaction = transaction;
+
+                var camposObjetoGenerico = ObterNomePropriedades(objeto);
+                var camposPesquisa = new StringBuilder();
+
+                if (camposObjetoGenerico.Contains("NOMETABELA"))
+                    camposObjetoGenerico.Remove("NOMETABELA");
+
+                foreach (var item in camposObjetoGenerico)
+                    if (!item.ToUpper().Equals("ID" + ObterNomeTabela(objeto).ToUpper()))
+                        camposPesquisa = item == camposObjetoGenerico.Last() ? camposPesquisa.Append(item) : camposPesquisa.Append(item + ", ");
+
+                var parametros = ObterValoresObjeto(objeto);
+                var parametrosPesquisa = new StringBuilder();
+                foreach (var item in parametros)
+                    if (!item.ToUpper().Equals(parametros.First().ToUpper()))
+                        parametrosPesquisa = item == parametros.Last() ? parametrosPesquisa.Append(item) : parametrosPesquisa.Append(item + ", ");
+
+                var variaveisMudanca = new StringBuilder();
+                var valorClausula = string.Empty;
+                for (int i = 1; i < camposObjetoGenerico.Count(); i++)
+                {
+                    if (i == camposObjetoGenerico.Count() - 1)
+                        variaveisMudanca.Append(camposObjetoGenerico[i] + "=" + parametros[i]);
+                    else
+                        variaveisMudanca.Append(camposObjetoGenerico[i] + "=" + parametros[i] + ", ");
+
+                    if (valorClausula == string.Empty)
+                        valorClausula = parametroAlterar.ToUpper() == camposObjetoGenerico[i - 1].ToUpper() ? parametros[i - 1] : "";
+                }
+
+                comando.CommandText =
+                    $@" UPDATE {ObterNomeTabela(objeto)} 
+                                  SET {variaveisMudanca}
+                                WHERE {parametroAlterar} = {valorClausula}
+                              ";
+
+
+                var linhasRetornadas = comando.ExecuteNonQuery();
+
+                if (linhasRetornadas < 0)
+                {
+                    transaction.Rollback();
+                    retorno.Erro = true;
+                    retorno.MensagemErro = "Erro ao alterar no banco";
+                }
+                else
+                {
+                    if (commitTransaction)
+                        transaction.Commit();
+                }
+            }
+            catch (Exception exception)
+            {
+                transaction.Rollback();
+
+                retorno.Erro = true;
+                retorno.ErroLocal = exception.StackTrace;
+                retorno.MensagemErro = "Erro ao alterar no banco";
+            }
+
+            return retorno;
+        }
+        public virtual List<T> ConsultarComParametroSemPerderConexao(T objeto, RetornoTratado<T> retorno, IDbConnection conexao = null, IDbTransaction transaction = null)
+        {
+            var resultSelect = new Dictionary<string, object>();
+
+            var objetoPreenchido = new List<T>();
+
+            try
+            {
+                IDbCommand comando = conexao.CreateCommand();
+                comando.Transaction = transaction;
+
+                var propriedades = ObterNomePropriedades(objeto);
+
+                StringBuilder camposPesquisa = new StringBuilder();
+                if (propriedades.Contains("NOMETABELA"))
+                    propriedades.Remove("NOMETABELA");
+
+                foreach (var item in propriedades)
+                {
+                    camposPesquisa = item == propriedades.Last() ? camposPesquisa.Append(item) : camposPesquisa.Append(item + ", ");
+                }
+
+                comando.CommandText =
+                    $@" SELECT 
+                                {camposPesquisa}
+                            FROM {ObterNomeTabela(objeto)}
+                            {ObterWhere(objeto)}
+                            ";
+
+                if (conexao.State == ConnectionState.Closed)
+                    conexao.Open();
+                var linhasRetornadas = comando.ExecuteReader();
+
+                while (linhasRetornadas.Read())
+                {
+                    var stringJson = string.Empty;
+
+                    foreach (var propriedade in propriedades)
+                    {
+                        if (!propriedade.Equals("NOMETABELA"))
+                            resultSelect.Add(propriedade, linhasRetornadas[propriedade.ToUpper().ToString()]);
+                    }
+
+                    stringJson = JsonConvert.SerializeObject(resultSelect);
+
+                    objetoPreenchido.Add(JsonConvert.DeserializeObject<T>(stringJson));
+
+                    resultSelect.Clear();
+                }
+                linhasRetornadas.Close();
+            }
+            catch (Exception exception)
+            {
+                conexao.Close();
+
+                retorno.Erro = true;
+                retorno.ErroLocal = exception.StackTrace;
+                retorno.MensagemErro = "Erro ao consultar no banco";
+            }
+
+            return objetoPreenchido;
         }
 
-
-        private Dictionary<string, object> ObterCampoValoresObjeto(T objeto)
+        protected Dictionary<string, object> ObterCampoValoresObjeto(T objeto)
         {
             var tipoEntidade = typeof(T);
             var propriedades = tipoEntidade.GetProperties();
-            var sb = new StringBuilder();
             object valorDaPropriedade = null;
 
             var parametros = new Dictionary<string, object>();
@@ -313,7 +544,7 @@ namespace BibliotecaSenac.Repository
             return parametros;
         }
 
-        private List<string> ObterValoresObjeto(T objeto)
+        protected List<string> ObterValoresObjeto(T objeto)
         {
             var camposeValores = ObterCampoValoresObjeto(objeto);
             var valores = new List<string>();
@@ -330,11 +561,10 @@ namespace BibliotecaSenac.Repository
                 }
             }
 
-
             return valores;
         }
 
-        private List<string> ObterNomePropriedades(T objeto)
+        public List<string> ObterNomePropriedades(T objeto)
         {
             var camposeValores = ObterCampoValoresObjeto(objeto);
             var valores = new List<string>();
@@ -342,18 +572,45 @@ namespace BibliotecaSenac.Repository
             foreach (var item in camposeValores)
                 valores.Add(item.Key.ToString());
 
-
             return valores;
         }
 
 
-        private string ObterNomeTabela(T objeto)
+        protected string ObterNomeTabela(T objeto)
         {
-            var item = objeto.GetType().Name;
+            var camposeValores = ObterCampoValoresObjeto(objeto);
+            foreach (var item in camposeValores)
+            {
+                if (item.Key.ToUpper().Equals("NOMETABELA"))
+                    return item.Value.ToString();
+            }
 
-            item = item.Remove(item.Count() - 5, 5); // tira o nome "Model" da classe
+            return string.Empty;
+        }
 
-            return item;
+        public string ObterWhere(T objeto)
+        {
+            var where = new StringBuilder();
+            where.Append(" WHERE ");
+
+            var camposValores = ObterCampoValoresObjeto(objeto);
+            foreach (var item in camposValores)
+            {
+                if (!item.Key.ToUpper().Equals("NOMETABELA"))
+                {
+                    if (item.Value is string && !string.IsNullOrEmpty(item.Value.ToString()))
+                    {
+                        where.Append($" {item.Key} LIKE '%{item.Value}%' OR");
+                    }
+                    else if (item.Value is int && !item.Value.ToString().Equals("0"))
+                    {
+                        where.Append($" {item.Key} = {item.Value} OR");
+                    }
+                }
+            }
+            where.Remove(where.Length - 3, 3); // tira o ultimo "OR"
+
+            return where.ToString();
         }
     }
 }

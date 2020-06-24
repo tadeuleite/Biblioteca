@@ -18,84 +18,84 @@ namespace BibliotecaSenac.Business
             repositoryGeneric = _repositoryGeneric;
         }
 
-        public RetornoTratado<T> InserirValidar(T aluno, RetornoTratado<T> retorno)
+        public RetornoTratado<T> InserirValidar(T objeto, RetornoTratado<T> retorno)
         {
-            retorno = ValidarAluno(aluno, retorno);
+            retorno = Validarobjeto(objeto, retorno);
 
             if (retorno.Erro == false)
             {
-                retorno = repositoryGeneric.Inserir(aluno, retorno);
+                retorno = repositoryGeneric.Inserir(objeto, retorno);
             }
 
             return retorno;
         }
 
-        public RetornoTratado<T> AlterarValidar(T aluno, RetornoTratado<T> retorno, string parametroAlterar)
+        public RetornoTratado<T> AlterarValidar(T objeto, RetornoTratado<T> retorno, string parametroAlterar)
         {
-            retorno = ValidarAluno(aluno, retorno);
+            retorno = Validarobjeto(objeto, retorno);
 
             if (retorno.Erro == false)
             {
-                retorno = repositoryGeneric.Alterar(aluno, retorno, parametroAlterar);
+                retorno = repositoryGeneric.Alterar(objeto, retorno, parametroAlterar);
             }
 
             return retorno;
         }
 
-        public RetornoTratado<T> DeletarValidar(T aluno, RetornoTratado<T> retorno, string parametroDeletar)
+        public RetornoTratado<T> DeletarValidar(T objeto, RetornoTratado<T> retorno, string parametroDeletar)
         {
-            retorno = ValidarAluno(aluno, retorno);
+            retorno = Validarobjeto(objeto, retorno);
 
             if (retorno.Erro == false)
             {
-                retorno = repositoryGeneric.Deletar(aluno, retorno, parametroDeletar);
+                retorno = repositoryGeneric.Deletar(objeto, retorno, parametroDeletar);
             }
 
             return retorno;
         }
 
-        public List<T> ConsultarValidar(T aluno, RetornoTratado<T> retorno)
+        public List<T> ConsultarValidar(T objeto, RetornoTratado<T> retorno)
         {
-            retorno = ValidarAluno(aluno, retorno);
+            retorno = Validarobjeto(objeto, retorno);
 
             if (retorno.Erro == false)
             {
             }
-            var retornos = repositoryGeneric.Consultar(aluno, retorno);
+            var retornos = repositoryGeneric.Consultar(objeto, retorno);
             return retornos;
         }
 
-        public List<T> ConsultarPorParametro(T aluno, RetornoTratado<T> retorno, string parametroConsultar)
+        public List<T> ConsultarComParametro(T objeto, RetornoTratado<T> retorno)
         {
-            retorno = ValidarAluno(aluno, retorno);
+            retorno = Validarobjeto(objeto, retorno);
 
             if (retorno.Erro == false)
             {
             }
-            var retornos = repositoryGeneric.ConsultarPorParametro(aluno, retorno, parametroConsultar);
+            var retornos = repositoryGeneric.ConsultarComParametro(objeto, retorno);
             return retornos;
         }
 
 
-        private RetornoTratado<T> ValidarAluno(T aluno, RetornoTratado<T> retorno)
+        private RetornoTratado<T> Validarobjeto(T objeto, RetornoTratado<T> retorno)
         {
             //// TODO: Validar se o cpf ta correto e se email ta no formato correto
-            //if (aluno.Cpf == string.Empty)
+            //if (objeto.Cpf == string.Empty)
             //{
             //    retorno.Erro = true;
             //    retorno.MensagemErro = "Cpf inválido";
             //}
-            //else if (aluno.Matricula == string.Empty)
+            //else if (objeto.Matricula == string.Empty)
             //{
             //    retorno.Erro = true;
             //    retorno.MensagemErro = "Matricula inválida";
             //}
-            //else if (aluno.Nome == string.Empty)
+            //else if (objeto.Nome == string.Empty)
             //{
             //    retorno.Erro = true;
             //    retorno.MensagemErro = "Nome inválido";
             //}
-            //else if (aluno.Email == string.Empty)
+            //else if (objeto.Email == string.Empty)
             //{
             //    retorno.Erro = true;
             //    retorno.MensagemErro = "E-mail inválido";

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace BibliotecaSenac.Model
+﻿namespace BibliotecaSenac.Model
 {
     public class AlunoModel
     {
@@ -12,6 +10,12 @@ namespace BibliotecaSenac.Model
         public string Telefone { get; set; }
         public string Cpf { get; set; }
 
+        public string NOMETABELA
+        {
+            get { return "Aluno"; }
+            private set { }
+        }
+        // Preencher NomeTabela com o nome da tabela no banco, propriedades com mesmo nome do banco e id começando com -1
         public AlunoModel()
         {
             IdAluno = 0;

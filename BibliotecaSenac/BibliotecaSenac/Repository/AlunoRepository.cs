@@ -13,6 +13,6 @@ namespace BibliotecaSenac.Repository
             configuration = _configuration;
         }
 
-      
+
     }
 }

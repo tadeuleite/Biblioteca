@@ -9,6 +9,6 @@ namespace BibliotecaSenac.Business
         RetornoTratado<T> AlterarValidar(T aluno, RetornoTratado<T> retorno, string parametroAlterar);
         RetornoTratado<T> DeletarValidar(T aluno, RetornoTratado<T> retorno, string parametroDeletar);
         List<T> ConsultarValidar(T aluno, RetornoTratado<T> retorno);
-        List<T> ConsultarPorParametro(T aluno, RetornoTratado<T> retorno, string parametroConsultar);
+        List<T> ConsultarComParametro(T aluno, RetornoTratado<T> retorno);
     }
 }

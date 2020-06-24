@@ -7,7 +7,13 @@
         public string Editora { get; set; }
         public string Versao { get; set; }
         public string Autor { get; set; }
+        public int Quantidade { get; set; }
 
+        public string NOMETABELA
+        {
+            get { return "Livro"; }
+            private set { }
+        }
         public LivroModel()
         {
             IdLivro = 0;
@@ -15,6 +21,7 @@
             Editora = string.Empty;
             Versao = string.Empty;
             Autor = string.Empty;
+            Quantidade = 0;
         }
     }
 }
