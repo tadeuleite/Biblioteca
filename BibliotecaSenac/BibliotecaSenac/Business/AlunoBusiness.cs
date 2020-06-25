@@ -1,6 +1,8 @@
 ﻿using BibliotecaSenac.Business.InterfaceBusiness;
 using BibliotecaSenac.Model;
+using BibliotecaSenac.Repository;
 using BibliotecaSenac.Repository.InterfaceRepository;
+using System.Collections.Generic;
 
 namespace BibliotecaSenac.Business
 {
@@ -13,5 +15,19 @@ namespace BibliotecaSenac.Business
             alunoRepository = _alunoRepository;
         }
 
+        public List<RetornoEmprestimoAluno> ConsultarEmprestimosAluno(AlunoModel objeto, RetornoTratado<RetornoEmprestimoAluno> retorno)
+        {
+            var retornos = alunoRepository.ConsultarEmprestimosAluno(objeto, retorno);
+
+            return retornos;
+            
+        }
+
+        public List<RetornoEmprestimoAluno> ConsultarReservaAluno(AlunoModel objeto, RetornoTratado<RetornoEmprestimoAluno> retorno)
+        {
+            var retornos = alunoRepository.ConsultarReservaAluno(objeto, retorno);
+
+            return retornos;
+        }
     }
 }

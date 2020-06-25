@@ -39,13 +39,14 @@ namespace BibliotecaSenac.Controller
         }
 
         /// <summary>
-        /// Método genérico para alterar um dado, quando alterar, enviar todos os dados, mesmo os não alterados
+        /// Método genérico para alterar um dado, quando alterar, enviar todos os dados, os alterados e não alterados
+        /// O parâmetro alterar é o nome da coluna do banco(mesma da model) que será usado como referência
         /// </summary>
         /// <param name="objeto"></param>
         /// <param name="parametroAlterar">Parâmetro identificador para alteração no banco</param>
         /// <returns></returns>
         [HttpPut]
-        public IActionResult Alterar(T objeto, string parametroAlterar)
+        public IActionResult Alterar([FromBody]T objeto, string parametroAlterar)
         {
             RetornoTratado<T> retorno = new RetornoTratado<T>();
 
@@ -59,12 +60,13 @@ namespace BibliotecaSenac.Controller
 
         /// <summary>
         /// Método genérico para Deletar
+        /// O parâmetro deletar é o nome da coluna do banco(mesma da model) que será usado como referência
         /// </summary>
         /// <param name="objeto"></param>
         /// <param name="parametroDeletar">Parâmetro identificador para alteração no banco</param>
         /// <returns></returns>
         [HttpDelete]
-        public IActionResult Deletar(T objeto, string parametroDeletar)
+        public IActionResult Deletar([FromBody]T objeto, string parametroDeletar)
         {
             RetornoTratado<T> retorno = new RetornoTratado<T>();
 
@@ -82,7 +84,7 @@ namespace BibliotecaSenac.Controller
         /// <param name="objeto">Não necessário</param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult Consultar(T objeto)
+        public IActionResult Consultar([FromBody]T objeto)
         {
             RetornoTratado<T> retorno = new RetornoTratado<T>();
             retorno.Objeto = genericBusiness.ConsultarValidar(objeto, retorno);
@@ -93,6 +95,11 @@ namespace BibliotecaSenac.Controller
                 return Ok(retorno);
         }
 
+        /// <summary>
+        /// Método genérico para consultar um registro específico
+        /// </summary>
+        /// <param name="objeto"></param>
+        /// <returns></returns>
         [HttpPost]
         public IActionResult ConsultarComParametro([FromBody]T objeto)
         {

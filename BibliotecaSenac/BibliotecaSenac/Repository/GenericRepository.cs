@@ -596,15 +596,18 @@ namespace BibliotecaSenac.Repository
             var camposValores = ObterCampoValoresObjeto(objeto);
             foreach (var item in camposValores)
             {
-                if (!item.Key.ToUpper().Equals("NOMETABELA"))
+                if (!(item.Key.ToUpper().Equals("ID" + ObterNomeTabela(objeto).ToUpper()) && item.Value.ToString().Equals("-1")))
                 {
-                    if (item.Value is string && !string.IsNullOrEmpty(item.Value.ToString()))
+                    if (!item.Key.ToUpper().Equals("NOMETABELA"))
                     {
-                        where.Append($" {item.Key} LIKE '%{item.Value}%' OR");
-                    }
-                    else if (item.Value is int && !item.Value.ToString().Equals("0"))
-                    {
-                        where.Append($" {item.Key} = {item.Value} OR");
+                        if (item.Value is string && !string.IsNullOrEmpty(item.Value.ToString()))
+                        {
+                            where.Append($" {item.Key} LIKE '%{item.Value}%' AND");
+                        }
+                        else if (item.Value is int && !item.Value.ToString().Equals("0"))
+                        {
+                            where.Append($" {item.Key} = {item.Value} AND");
+                        }
                     }
                 }
             }

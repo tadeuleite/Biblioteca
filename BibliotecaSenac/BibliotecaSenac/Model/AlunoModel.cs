@@ -12,13 +12,13 @@
 
         public string NOMETABELA
         {
-            get { return "Aluno"; }
+            get { return "ALUNO"; }
             private set { }
         }
         // Preencher NomeTabela com o nome da tabela no banco, propriedades com mesmo nome do banco e id começando com -1
         public AlunoModel()
         {
-            IdAluno = 0;
+            IdAluno = -1;
             Nome = string.Empty;
             Matricula = string.Empty;
             Email = string.Empty;

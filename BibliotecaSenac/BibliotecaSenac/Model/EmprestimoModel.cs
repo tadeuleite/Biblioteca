@@ -14,11 +14,12 @@ namespace BibliotecaSenac.Model
 
         public string NOMETABELA
         {
-            get { return "Emprestimo"; }
+            get { return "EMPRESTIMO"; }
             private set { }
         }
         public EmprestimoModel()
         {
+            IdEmprestimo = -1;
             Aluno = new AlunoModel();
             Livros = new List<LivroModel>();
         }

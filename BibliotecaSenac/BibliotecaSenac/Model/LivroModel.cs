@@ -11,12 +11,12 @@
 
         public string NOMETABELA
         {
-            get { return "Livro"; }
+            get { return "LIVRO"; }
             private set { }
         }
         public LivroModel()
         {
-            IdLivro = 0;
+            IdLivro = -1;
             Nome = string.Empty;
             Editora = string.Empty;
             Versao = string.Empty;

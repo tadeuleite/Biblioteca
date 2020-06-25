@@ -1,19 +1,23 @@
-﻿namespace BibliotecaSenac.Model
+﻿using System.Collections.Generic;
+
+namespace BibliotecaSenac.Model
 {
     public class EmprestimoLivroModel
     {
+        public int IdEmprestimoLivro { get; set; }
         public EmprestimoModel Emprestimo { get; set; }
-        public LivroModel Livro { get; set; }
+        public List<LivroModel> Livros { get; set; }
 
         public string NOMETABELA
         {
-            get { return "EmprestimoLivro"; }
+            get { return "EMPRESTIMOLIVRO"; }
             private set { }
         }
         public EmprestimoLivroModel()
         {
+            IdEmprestimoLivro = -1;
             Emprestimo = new EmprestimoModel();
-            Livro = new LivroModel();
+            Livros = new List<LivroModel>();
         }
     }
 }

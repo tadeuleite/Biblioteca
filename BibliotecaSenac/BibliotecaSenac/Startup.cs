@@ -74,6 +74,7 @@ namespace BibliotecaSenac
             services.AddScoped<IAlunoBusiness, AlunoBusiness>();
             services.AddScoped<ILivroBusiness, LivroBusiness>();
             services.AddScoped<IEmprestimoBusiness, EmprestimoBusiness>();
+            services.AddScoped<IReservaBusiness, ReservaBusiness>();
 
             #endregion
 
@@ -81,6 +82,7 @@ namespace BibliotecaSenac
             services.AddScoped<IAlunoRepository, AlunoRepository>();
             services.AddScoped<ILivroRepository, LivroRepository>();
             services.AddScoped<IEmprestimoRepository, EmprestimoRepository>();
+            services.AddScoped<IReservaRepository, ReservaRepository>();
 
             #endregion
             return services;

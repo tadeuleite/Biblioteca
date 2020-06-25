@@ -2,26 +2,25 @@
 using BibliotecaSenac.Repository.InterfaceRepository;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 
 namespace BibliotecaSenac.Repository
 {
-    public class EmprestimoRepository : GenericRepository<EmprestimoModel>, IEmprestimoRepository
+    public class ReservaRepository : GenericRepository<ReservaModel>, IReservaRepository
     {
         private readonly IConfiguration config;
         private readonly IAlunoRepository alunoRepository;
         private readonly ILivroRepository livroRepository;
 
-        public EmprestimoRepository(IAlunoRepository _alunoRepository, ILivroRepository _livroRepository, IConfiguration _config) : base(_config)
+        public ReservaRepository(IAlunoRepository _alunoRepository, ILivroRepository _livroRepository, IConfiguration _configuration) : base(_configuration)
         {
-            config = _config;
+            config = _configuration;
             alunoRepository = _alunoRepository;
             livroRepository = _livroRepository;
         }
 
-        public override RetornoTratado<EmprestimoModel> Inserir(EmprestimoModel objeto, RetornoTratado<EmprestimoModel> retorno, bool commitTransaction = false, IDbConnection conexao = null, IDbTransaction transaction = null)
+        public override RetornoTratado<ReservaModel> Inserir(ReservaModel objeto, RetornoTratado<ReservaModel> retorno, bool commitTransaction = false, IDbConnection conexao = null, IDbTransaction transaction = null)
         {
             using (conexao = new SqlConnection(config.GetValue<string>("SqlConnection")))
             {
@@ -50,9 +49,9 @@ namespace BibliotecaSenac.Repository
                         comando.CommandText =
                             $@" INSERT INTO 
                                 {ObterNomeTabela(objeto)} 
-                                    (DATAINICIO, DATAFIM, DATADEVOLUCAO, IDALUNO)
+                                    (DATAINICIO, DATAFIM, IDALUNO)
                                 VALUES                    
-                                    ('{objeto.DataInicio.ToString("dd/MM/yyy")}', '{objeto.DataFim.ToString("dd/MM/yyy")}', '{objeto.DataDevolucao.ToString("dd/MM/yyy")}', {alunoBusca[0].IdAluno});
+                                    ('{objeto.DataInicio.ToString("dd/MM/yyy")}', '{objeto.DataFim.ToString("dd/MM/yyy")}', {alunoBusca[0].IdAluno});
                                  ";
 
                         var linhasRetornadas = comando.ExecuteNonQuery();
@@ -65,13 +64,13 @@ namespace BibliotecaSenac.Repository
                             return retorno;
                         }
 
-                        comando.CommandText = "SELECT SCOPE_IDENTITY() AS IDEMPRESTIMO";
+                        comando.CommandText = "SELECT SCOPE_IDENTITY() AS IDRESERVA";
 
                         var emprestimoInserido = comando.ExecuteReader();
-                        var idEmprestimo = 0;
+                        var idReserva = 0;
                         while (emprestimoInserido.Read())
                         {
-                            idEmprestimo = (int)emprestimoInserido.GetDecimal(0);
+                            idReserva = (int)emprestimoInserido.GetDecimal(0);
                         }
                         emprestimoInserido.Close();
 
@@ -103,10 +102,10 @@ namespace BibliotecaSenac.Repository
                             comando.CommandText =
                                 $@"
                                 INSERT INTO 
-                                    EMPRESTIMOLIVRO
-                                           (IDLIVRO, IDEMPRESTIMO)
+                                    RESERVALIVRO
+                                           (IDLIVRO, IDRESERVA)
                                 VALUES
-                                           ({livroBusca[0].IdLivro},{idEmprestimo})
+                                           ({livroBusca[0].IdLivro},{idReserva})
                               ";
                             linhasRetornadas = comando.ExecuteNonQuery();
 
@@ -144,11 +143,6 @@ namespace BibliotecaSenac.Repository
                 }
             }
             return retorno;
-        }
-
-        public override List<EmprestimoModel> ConsultarComParametro(EmprestimoModel objeto, RetornoTratado<EmprestimoModel> retorno, IDbConnection conexao = null, IDbTransaction transaction = null)
-        {
-            return base.ConsultarComParametro(objeto, retorno, conexao, transaction);
         }
     }
 }
